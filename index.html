@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perfil do Usuário</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+
+</head>
+<style>
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f4f8; 
+  }
+
+  
+  .profile-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  
+  .profile-header {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    border-radius: 12px 12px 0 0;
+    padding: 2rem;
+    color: white;
+  }
+
+  
+  .profile-photo-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background-color: #e5e7eb; 
+    margin: 0 auto;
+  }
+
+ 
+  .photo-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #6b7280; 
+  }
+
+  
+  .edit-photo-btn {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: #4f46e5;
+    color: white;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  
+  .form-section,
+  .view-section {
+    background-color: white;
+    border-radius: 0 0 12px 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+  }
+
+  
+  .input-group {
+    margin-bottom: 1.5rem;
+  }
+
+  
+  textarea {
+    resize: vertical;
+  }
+</style>
+
+<body>
+  
+<!-- Modal que aparece pra confirmar a exclusão dos dados -->
+<div id="confirmModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 hidden items-center justify-center">
+  <div class="bg-white rounded-lg shadow-lg max-w-sm w-full p-6">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Tem certeza que deseja excluir os dados?</h2>
+    <div class="flex justify-end space-x-4">
+      <button id="cancelDelete" class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancelar</button>
+      <button id="confirmDelete" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Sim, excluir</button>
+    </div>
+  </div>
+</div>
+
+<div class="profile-container my-10">
+  <!-- Cabeçalho do perfil com título centralizado e fundo destacado -->
+  <div class="profile-header text-center">
+    <h1 class="text-3xl font-bold mb-4">Perfil do Usuário</h1>
+
+    <!-- Área da foto de perfil com visualização e botão de edição em cima -->
+    <div class="profile-photo-container mx-auto">
+      <div id="photoPreview" class="photo-placeholder">
+        <!-- Ícone que aparece enquanto não tiver nenhuma foto carregada -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      </div>
+
+      <!-- Botão para trocar a imagem de perfil -->
+      <label for="photoInput" class="edit-photo-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </label>
+      <input type="file" id="photoInput" accept="image/png" class="hidden" />
+    </div>
+  </div>
+
+  <!-- Formulário de edição de perfil (modo edição ativo) -->
+  <div id="editForm" class="form-section">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Campos com seus respectivos labels -->
+      <div class="input-group">
+        <label for="nome" class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+        <input type="text" id="nome" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <div class="input-group">
+        <label for="idade" class="block text-sm font-medium text-gray-700 mb-1">Idade</label>
+        <input type="number" id="idade" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <div class="input-group">
+        <label for="estado" class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+        <input type="text" id="estado" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <div class="input-group">
+        <label for="bairro" class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
+        <input type="text" id="bairro" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <div class="input-group">
+        <label for="rua" class="block text-sm font-medium text-gray-700 mb-1">Rua</label>
+        <input type="text" id="rua" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+    </div>
+
+    <!-- Campo maior para texto livre da biografia -->
+    <div class="input-group mt-4">
+      <label for="biografia" class="block text-sm font-medium text-gray-700 mb-1">Biografia</label>
+      <textarea id="biografia" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    </div>
+
+    <!-- Botão para salvar as alterações -->
+    <div class="flex justify-end space-x-4 mt-6">
+      <button id="saveBtn" class="px-6 py-2 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors">
+        Salvar Dados
+      </button>
+    </div>
+  </div>
+
+  <!-- Seção de visualização do perfil após salvar -->
+  <div id="viewProfile" class="view-section hidden">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Mostra os dados preenchidos no modo leitura -->
+      <div class="mb-4">
+        <h3 class="text-sm font-medium text-gray-500">Nome</h3>
+        <p id="viewNome" class="text-lg font-medium text-gray-900">-</p>
+      </div>
+      <div class="mb-4">
+        <h3 class="text-sm font-medium text-gray-500">Idade</h3>
+        <p id="viewIdade" class="text-lg font-medium text-gray-900">-</p>
+      </div>
+      <div class="mb-4">
+        <h3 class="text-sm font-medium text-gray-500">Estado</h3>
+        <p id="viewEstado" class="text-lg font-medium text-gray-900">-</p>
+      </div>
+      <div class="mb-4">
+        <h3 class="text-sm font-medium text-gray-500">Bairro</h3>
+        <p id="viewBairro" class="text-lg font-medium text-gray-900">-</p>
+      </div>
+      <div class="mb-4">
+        <h3 class="text-sm font-medium text-gray-500">Rua</h3>
+        <p id="viewRua" class="text-lg font-medium text-gray-900">-</p>
+      </div>
+    </div>
+
+    <!-- Biografia exibida separadamente -->
+    <div class="mt-4">
+      <h3 class="text-sm font-medium text-gray-500">Biografia</h3>
+      <p id="viewBiografia" class="text-lg font-medium text-gray-900 mt-2">-</p>
+    </div>
+
+    <!-- Ações disponíveis no modo visualização -->
+    <div class="flex justify-end mt-6">
+      <button id="editBtn" class="px-6 py-2 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors">
+        Editar Dados
+      </button>
+      <button id="deleteBtn" class="ml-4 px-6 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors">
+        Excluir Dados
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+// Utilitários DOM
+const getEl = (id) => document.getElementById(id);
+const getVal = (id) => getEl(id).value.trim();
+const setText = (id, text) => getEl(id).textContent = text;
+
+const photoInput = getEl('photoInput');
+const photoPreview = getEl('photoPreview');
+const saveBtn = getEl('saveBtn');
+const editBtn = getEl('editBtn');
+const deleteBtn = getEl('deleteBtn');
+const editForm = getEl('editForm');
+const viewProfile = getEl('viewProfile');
+const confirmModal = getEl('confirmModal');
+const confirmDelete = getEl('confirmDelete');
+const cancelDelete = getEl('cancelDelete');
+
+const formFields = ['nome', 'idade', 'estado', 'bairro', 'rua', 'biografia'];
+
+// Preview de imagem
+photoInput.addEventListener('change', ({ target }) => {
+  const file = target.files[0];
+
+  if (!file) return;
+
+  if (file.type !== 'image/png') {
+    alert('Apenas imagens PNG são permitidas.');
+    target.value = '';
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = ({ target }) => {
+    photoPreview.innerHTML = `
+      <img src="${target.result}" alt="Foto de perfil" class="w-full h-full object-cover" />
+    `;
+  };
+  reader.readAsDataURL(file);
+});
+
+// Validação e envio dos dados
+saveBtn.addEventListener('click', async () => {
+  if (!validateFields()) {
+    alert('Preencha todos os campos antes de salvar.');
+    return;
+  }
+
+  updateView();
+
+  const fotoBase64 = getPhotoBase64();
+
+  const payload = Object.fromEntries(
+    formFields.map((f) => [f, getVal(f)])
+  );
+  payload.id = 1;
+  payload.foto_url = fotoBase64;
+
+  try {
+    const res = await fetch('salvar_usuario.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if (data.status === 'ok') {
+      toggleViewMode(true);
+    } else {
+      throw new Error(data.message || 'Erro inesperado no servidor.');
+    }
+  } catch (err) {
+    console.error('Erro ao salvar:', err);
+    alert('Erro ao salvar os dados no servidor.');
+  }
+});
+
+editBtn.addEventListener('click', () => toggleViewMode(false));
+
+// Modal de exclusão
+deleteBtn.addEventListener('click', () => toggleModal(true));
+cancelDelete.addEventListener('click', () => toggleModal(false));
+
+confirmDelete.addEventListener('click', async () => {
+  try {
+    const res = await fetch('excluir_usuario.php?id=1');
+    const data = await res.json();
+    console.log('Usuário excluído:', data);
+  } catch (err) {
+    console.error('Erro ao excluir:', err);
+    alert('Erro ao tentar excluir os dados.');
+  }
+
+  formFields.forEach((f) => {
+    getEl(f).value = '';
+    setText('view' + capitalize(f), '-');
+  });
+
+  photoPreview.innerHTML = getDefaultPhotoSVG();
+  toggleModal(false);
+  toggleViewMode(false);
+});
+
+// Funções utilitárias
+function validateFields() {
+  return formFields.reduce((isValid, field) => {
+    const input = getEl(field);
+    const valid = !!input.value.trim();
+    input.classList.toggle('border-red-500', !valid);
+    return isValid && valid;
+  }, true);
+}
+
+function updateView() {
+  formFields.forEach((f) => {
+    setText('view' + capitalize(f), getVal(f));
+  });
+}
+
+function getPhotoBase64() {
+  const img = document.querySelector('#photoPreview img');
+  return img ? img.src : '';
+}
+
+function toggleViewMode(viewOnly) {
+  editForm.classList.toggle('hidden', viewOnly);
+  viewProfile.classList.toggle('hidden', !viewOnly);
+}
+
+function toggleModal(show) {
+  confirmModal.classList.toggle('hidden', !show);
+  confirmModal.classList.toggle('flex', show);
+}
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function getDefaultPhotoSVG() {
+  return `
+    <div class="photo-placeholder">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
+    </div>
+  `;
+}
+</script>
+
+</body>
+</html>
